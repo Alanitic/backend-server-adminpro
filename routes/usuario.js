@@ -44,7 +44,7 @@ app.post('/', (req, res) => {
 
     usuario.save((err, usuarioGuardado) => {
         if (err) {
-            return res.status(500).json({
+            return res.status(400).json({
                 ok: false,
                 mensaje: 'Error al guardar el usuario en base de datos',
                 errors: err
@@ -55,6 +55,7 @@ app.post('/', (req, res) => {
             usuario: usuarioGuardado
         });
     });
+
 });
 
 
