@@ -4,6 +4,10 @@ var Usuario = require('../models/usuario');
 var bcrypt = require('bcrypt');
 
 
+var jwt = require('jsonwebtoken');
+var seed = require('../config/config').SEED;
+
+
 var app = express();
 
 // ==================================================
@@ -27,6 +31,27 @@ app.get('/', (req, res, next) => {
             });
         });
 
+
+});
+
+// ==================================================
+// Verificar token
+// ==================================================
+
+app.use('/', (req, res, next) => {
+
+    var token = req.query.token;
+    jwt.verify(token, seed, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({
+                ok: false,
+                mensaje: 'Token incorrecto',
+                errors: err
+            });
+        }
+
+        next();
+    });
 
 });
 
