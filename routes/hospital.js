@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 // Actualizar hospital
 // ==================================================
 
-app.put('/:id', (req, res) => {
+app.put('/:id', mdAtenticacion.verificaToken, (req, res) => {
     var id = req.params.id;
     var body = req.body;
     Hospital.findById(id, (err, hospital) => {
@@ -73,7 +73,7 @@ app.put('/:id', (req, res) => {
 // Crear un nuevo Hospital
 // ==================================================
 
-app.post('/', (req, res) => {
+app.post('/', mdAtenticacion.verificaToken, (req, res) => {
     var body = req.body;
 
     var hospital = new Hospital({
@@ -100,7 +100,7 @@ app.post('/', (req, res) => {
 // ==================================================
 // Borrando un hospital
 // ==================================================
-app.delete('/:id', (req, res) => {
+app.delete('/:id', mdAtenticacion.verificaToken, (req, res) => {
     var id = req.params.id;
 
     Hospital.findByIdAndRemove(id, (err, hospitalBorrado) => {
