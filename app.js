@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var appRoutes = require('./routes/app');
 var usuarioRoutes = require('./routes/usuario');
 var usuarioLogin = require('./routes/login');
+var hospitalRoutes = require('./routes/hospital');
 
 // Inicializar variables
 var app = express();
@@ -26,6 +27,7 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) =
 // Rutas
 app.use('/usuario', usuarioRoutes);
 app.use('/login', usuarioLogin);
+app.use('/hospital', hospitalRoutes);
 app.use('/', appRoutes);
 
 // Escuchar peticiones
