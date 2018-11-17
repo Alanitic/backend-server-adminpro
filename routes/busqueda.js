@@ -13,14 +13,29 @@ app.get('/todo/:busqueda', (req, res, next) => {
     // La i es de que no considere mayúsculas
     var regex = new RegExp(busqueda, 'i');
 
-    Hospital.find({ nombre: regex }, (err, hospitales) => {
+    buscarHospitales(busqueda, regex)
+        .then(hospitales => {
 
-        res.status(200).json({
-            ok: true,
-            hospitales: hospitales
+            res.status(200).json({
+                ok: true,
+                hospitales: hospitales
+            });
+        });
+});
+
+function buscarHospitales(busqueda, regexp) {
+
+    return new Promise((resolve, reject) => {
+
+        Hospital.find({ nombre: regexp }, (err, hospitales) => {
+            if (err) {
+                reject('Error al cargar hospitales', err);
+            } else {
+                resolve(hospitales);
+            }
         });
     });
 
-});
+}
 
 module.exports = app;
