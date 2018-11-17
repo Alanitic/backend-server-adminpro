@@ -8,6 +8,7 @@ var appRoutes = require('./routes/app');
 var usuarioRoutes = require('./routes/usuario');
 var usuarioLogin = require('./routes/login');
 var hospitalRoutes = require('./routes/hospital');
+var medicoRoutes = require('./routes/medico');
 
 // Inicializar variables
 var app = express();
@@ -28,6 +29,7 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) =
 app.use('/usuario', usuarioRoutes);
 app.use('/login', usuarioLogin);
 app.use('/hospital', hospitalRoutes);
+app.use('/medico', medicoRoutes);
 app.use('/', appRoutes);
 
 // Escuchar peticiones
