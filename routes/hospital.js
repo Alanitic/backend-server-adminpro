@@ -11,19 +11,21 @@ var app = express();
 // ==================================================
 
 app.get('/', (req, res) => {
-    Hospital.find({}, (err, hospitales) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error al cargar hospitales',
-                error: err
+    Hospital.find({})
+        .populate('usuario', 'nombre email')
+        .exec((err, hospitales) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al cargar hospitales',
+                    error: err
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                mensaje: hospitales
             });
-        }
-        res.status(200).json({
-            ok: true,
-            mensaje: hospitales
         });
-    });
 });
 
 // ==================================================

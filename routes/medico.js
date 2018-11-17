@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
             ok: true,
             mensaje: medicos
         });
-    });
+    }).populate('usuario', 'nombre email').populate('hospital');
 });
 
 // ==================================================
