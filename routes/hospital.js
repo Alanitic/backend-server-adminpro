@@ -49,7 +49,7 @@ app.put('/:id', mdAtenticacion.verificaToken, (req, res) => {
             });
         }
         hospital.nombre = body.nombre;
-        hospital.img = body.img;
+        hospital.usuario = req.usuario._id;
         // TODO: Asignar el usuario que creó el registro
         hospital.save((err, hospitalActualizado) => {
             if (err) {
@@ -78,7 +78,8 @@ app.post('/', mdAtenticacion.verificaToken, (req, res) => {
 
     var hospital = new Hospital({
         nombre: body.nombre,
-        img: body.img
+        img: body.img,
+        usuario: req.usuario._id
     });
 
     hospital.save((err, hospitalNuevo) => {
