@@ -11,19 +11,29 @@ var app = express();
 // ==================================================
 
 app.get('/', (req, res) => {
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
     Medico.find({}, (err, medicos) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error al cargar los medicos',
-                error: err
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al cargar los medicos',
+                    error: err
+                });
+            }
+
+            Medico.count({}, (err, conteo) => {
+
+                res.status(200).json({
+                    ok: true,
+                    mensaje: medicos,
+                    total: conteo
+                });
+
             });
-        }
-        res.status(200).json({
-            ok: true,
-            mensaje: medicos
-        });
-    }).populate('usuario', 'nombre email').populate('hospital');
+
+        }).populate('usuario', 'nombre email').populate('hospital').skip(desde)
+        .limit(5);
 });
 
 // ==================================================
