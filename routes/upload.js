@@ -64,64 +64,61 @@ app.put('/:tipo/:id', (req, res) => {
                 errors: err
             });
         }
-        subirPorTipo(tipo, id, nombreArchivo, res);
+        subirPorTipo(tipo, id, path, res, nombreArchivo);
     });
 
 });
 
-function subirPorTipo(tipo, id, nombreArchivo, res) {
-    if (tipo === 'usuarios') {
+// ==================================================
+// Función para relacionar la imagen a alguna colección
+// ==================================================
 
-        Usuario.findById(id, (err, usuario) => {
+function subirPorTipo(tipo, id, path, res, nombreArchivo) {
+    var tipoColección;
+    switch (tipo) {
+        case 'usuarios':
+            tipoColección = Usuario;
+            break;
+        case 'medicos':
+            tipoColección = Medico;
+            break;
+        case 'hospitales':
+            tipoColección = Hospital;
+            break;
+    }
 
-            if (err) {
+    tipoColección.findById(id, 'nombre img')
+        .exec((err, resultado) => {
+            if (err || !resultado) {
+                fs.unlink(path, err => { if (err) throw err }); // Borro el archivo cuando no tengo id valido
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'No se encontró el usuario con ese ID',
-                    errors: err
+                    mensaje: `No se encontraron ${tipo} con ese id`,
+                    errors: { message: 'Debe selecionar un Id valido' }
                 });
             }
-
-            var pathViejo = './uploads/usuarios/' + usuario.img;
-
             // Si ya existe una imagen hay que eliminarla
+            var pathViejo = resultado.img;
             if (fs.existsSync(pathViejo)) {
-                fs.unlink(pathViejo, (err) => {
-                    if (err)  {
-                        return res.status(400).json({
-                            ok: false,
-                            mensaje: 'No se pudo eliminar la imagen anterior',
-                            errors: err
-                        });
-                    }
-                });
+                fs.unlink(pathViejo, err => { if (err) throw err });
             }
+            resultado.img = nombreArchivo;
 
-            usuario.img = nombreArchivo;
-            usuario.save((err, usuarioActualizado) => {
+            resultado.save((err, resultadoActualizado) => {
                 if (err) {
                     return res.status(400).json({
                         ok: false,
-                        mensaje: 'Error al actualizar el usuario en base de datos',
+                        mensaje: `Error al actualizar ${tipo}`,
                         errors: err
                     });
                 }
-                usuarioActualizado.password = ':)';
                 return res.status(200).json({
                     ok: true,
                     mensaje: 'Imagen de usuario actualizada',
-                    usuario: usuarioActualizado
+                    [resultado]: resultadoActualizado
                 });
-            })
+            });
         });
-
-    }
-    if (tipo === 'medicos') {
-
-    }
-    if (tipo === 'hospitales') {
-
-    }
 }
 
 module.exports = app;
