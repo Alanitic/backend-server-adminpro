@@ -27,6 +27,11 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) =
     console.log('Base de datos 27017: \x1b[32m%s\x1b[0m', 'online')
 });
 
+// Server index config
+// var serverIndex = require('serve-index');
+// app.use(express.static(__dirname + '/'));
+// app.use('/uploads', serverIndex(__dirname + '/uploads'));
+
 // Rutas
 app.use('/usuario', usuarioRoutes);
 app.use('/login', usuarioLogin);
