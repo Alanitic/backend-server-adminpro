@@ -17,30 +17,17 @@ app.get('/coleccion/:tabla/:busqueda', (req, res) => {
     var busqueda = req.params.busqueda;
     var regex = new RegExp(busqueda, 'i');
 
+    var promesa;
+
     switch (tabla) {
         case 'medicos':
-            buscarMedicos(busqueda, regex).then(medicos => {
-                res.status(200).json({
-                    ok: true,
-                    medicos: medicos
-                });
-            });
+            promesa = buscarMedicos(busqueda, regex);
             break;
         case 'hospitales':
-            buscarHospitales(busqueda, regex).then(hospitales => {
-                res.status(200).json({
-                    ok: true,
-                    hospitales: hospitales
-                });
-            });
+            promesa = buscarHospitales(busqueda, regex);
             break;
         case 'usuarios':
-            buscarUsuarios(busqueda, regex).then(usuarios => {
-                res.status(200).json({
-                    ok: true,
-                    usuarios: usuarios
-                });
-            });
+            promesa = buscarUsuarios(busqueda, regex);
             break;
         default:
             return res.status(400).json({
@@ -49,6 +36,14 @@ app.get('/coleccion/:tabla/:busqueda', (req, res) => {
                 error: { message: 'Tipo de tabla incorrecto' }
             });
     }
+
+    promesa.then(resultado => {
+        res.status(200).json({
+            ok: true,
+            [tabla]: resultado
+        });
+    });
+
 });
 
 
