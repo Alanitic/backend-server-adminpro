@@ -1,13 +1,18 @@
 var express = require('express');
 
 var fileUpload = require('express-fileupload');
+var fs = require('fs');
+
+var Usuario = require('../models/usuario');
+var Medico = require('../models/medico');
+var Hospital = require('../models/hospital');
 
 var app = express();
 
 // Using fileupload
 app.use(fileUpload());
 
-app.put('/:tipo/:id', (req, res, next) => {
+app.put('/:tipo/:id', (req, res) => {
 
     var tipo = req.params.tipo;
     var id = req.params.id;
@@ -47,21 +52,76 @@ app.put('/:tipo/:id', (req, res, next) => {
     }
 
     // Nombre de archivo personalizado
-    var nombreArchivo = `${ id }-${new Date().getMilliseconds}.${extensionArchivo}`;
+    var nombreArchivo = `${id}-${new Date().getMilliseconds()}.${extensionArchivo}`;
     // Mover el archivo
     var path = `./uploads/${tipo}/${nombreArchivo}`;
     archivo.mv(path, (err) => {
-        return res.status(500).json({
-            ok: false,
-            mensaje: 'Error al mover archivo',
-            errors: err
-        });
+        if (err) {
+
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al mover archivo',
+                errors: err
+            });
+        }
+        subirPorTipo(tipo, id, nombreArchivo, res);
     });
 
-    res.status(200).json({
-        ok: true,
-        mensaje: 'Archivo movido'
-    });
 });
+
+function subirPorTipo(tipo, id, nombreArchivo, res) {
+    if (tipo === 'usuarios') {
+
+        Usuario.findById(id, (err, usuario) => {
+
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'No se encontró el usuario con ese ID',
+                    errors: err
+                });
+            }
+
+            var pathViejo = './uploads/usuarios/' + usuario.img;
+
+            // Si ya existe una imagen hay que eliminarla
+            if (fs.existsSync(pathViejo)) {
+                fs.unlink(pathViejo, (err) => {
+                    if (err)  {
+                        return res.status(400).json({
+                            ok: false,
+                            mensaje: 'No se pudo eliminar la imagen anterior',
+                            errors: err
+                        });
+                    }
+                });
+            }
+
+            usuario.img = nombreArchivo;
+            usuario.save((err, usuarioActualizado) => {
+                if (err) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'Error al actualizar el usuario en base de datos',
+                        errors: err
+                    });
+                }
+                usuarioActualizado.password = ':)';
+                return res.status(200).json({
+                    ok: true,
+                    mensaje: 'Imagen de usuario actualizada',
+                    usuario: usuarioActualizado
+                });
+            })
+        });
+
+    }
+    if (tipo === 'medicos') {
+
+    }
+    if (tipo === 'hospitales') {
+
+    }
+}
 
 module.exports = app;
