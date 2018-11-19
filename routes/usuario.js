@@ -98,7 +98,7 @@ app.put('/:id', mdAtenticacion.verificaToken, (req, res) => {
 // ==================================================
 // Crear un nuevo usuario
 // ==================================================
-app.post('/', mdAtenticacion.verificaToken, (req, res) => {
+app.post('/', (req, res) => {
     var body = req.body;
 
     var usuario = new Usuario({
@@ -117,6 +117,7 @@ app.post('/', mdAtenticacion.verificaToken, (req, res) => {
                 errors: err
             });
         }
+        usuarioGuardado.password = ':)';
         res.status(201).json({
             ok: true,
             usuario: usuarioGuardado,
